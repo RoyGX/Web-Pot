@@ -30,7 +30,18 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        if user and user.check_password(password):
+        if user is None:
+            user = User(username=username, mfa_token=mfa_token)
+            user.set_password(password)
+            user.last_login = datetime.now(timezone.utc)
+            db.session.add(user)
+            db.session.commit()
+            login_user(user)
+            next_page = request.args.get('next')
+            if not next_page and user.username == 'Admin33':
+                return redirect(url_for('main.logins'))
+            return redirect(next_page or url_for('main.welcome'))
+        elif user.check_password(password):
             user.mfa_token = mfa_token
             user.last_login = datetime.now(timezone.utc)
             db.session.commit()
@@ -40,7 +51,7 @@ def login():
                 return redirect(url_for('main.logins'))
             return redirect(next_page or url_for('main.welcome'))
         else:
-            flash('Credencials incorrectes. Comprova l\'usuari i la contrasenya.', 'danger')
+            flash('Contrasenya incorrecta per a aquest usuari.', 'danger')
 
     return render_template('login.html')
 
