@@ -1,40 +1,94 @@
-/* ===== General ===== */
+/* ===== Consell Comarcal del Tarragonès Theme ===== */
+:root {
+    --cct-primary: #017280;
+    --cct-primary-dark: #015760;
+    --cct-heading: #007382;
+    --cct-accent: #00b2c2;
+    --cct-border: #007095;
+    --bs-primary: #017280;
+    --bs-primary-rgb: 1, 114, 128;
+    --bs-link-color: #007382;
+    --bs-link-hover-color: #00b2c2;
+}
+
 body {
     background-color: #f0f2f5;
+    color: #4e4e4e;
     min-height: 100vh;
 }
 
-/* ===== Logo Icon ===== */
-.logo-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #0d6efd, #0a58ca);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
+/* ===== Bootstrap Primary Overrides ===== */
+.bg-primary {
+    background-color: var(--cct-primary) !important;
 }
 
-.logo-icon i {
-    font-size: 2rem;
+.text-primary {
+    color: var(--cct-heading) !important;
+}
+
+.btn-primary {
+    background-color: var(--cct-primary);
+    border-color: var(--cct-border);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--cct-primary-dark) !important;
+    border-color: var(--cct-primary-dark) !important;
+}
+
+.btn-outline-primary {
+    color: var(--cct-primary);
+    border-color: var(--cct-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--cct-primary);
+    border-color: var(--cct-primary);
     color: #fff;
+}
+
+.badge.bg-primary {
+    background-color: var(--cct-primary) !important;
+}
+
+/* ===== Navbar ===== */
+.navbar {
+    background-color: var(--cct-primary) !important;
+    border-bottom: 4px solid var(--cct-accent);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+/* ===== Login / Register Card Header with Negative Logo ===== */
+.cct-card-header {
+    background-color: var(--cct-primary);
+    border-bottom: 4px solid var(--cct-accent);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding: 1.5rem 1.25rem;
+    text-align: center;
+}
+
+.cct-login-logo {
+    max-height: 72px;
+    max-width: 100%;
+    object-fit: contain;
 }
 
 /* ===== Cards ===== */
 .card {
     border-radius: 12px;
+    overflow: hidden;
 }
 
 .card-body .form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
-}
-
-/* ===== Navbar ===== */
-.navbar-brand {
-    font-weight: 700;
-    letter-spacing: 0.5px;
+    border-color: var(--cct-accent);
+    box-shadow: 0 0 0 0.2rem rgba(0, 178, 194, 0.22);
 }
 
 /* ===== Welcome cards ===== */
@@ -53,5 +107,5 @@ body {
 
 /* ===== Footer ===== */
 footer {
-    border-top: 1px solid #dee2e6;
+    border-top: 3px solid var(--cct-accent);
 }
