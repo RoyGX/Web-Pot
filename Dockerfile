@@ -16,4 +16,4 @@ RUN mkdir -p /app/data
 EXPOSE 5000
 
 # Run with gunicorn in production
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--access-logfile", "-", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--preload", "--access-logfile", "-", "run:app"]
