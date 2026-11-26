@@ -117,6 +117,29 @@ def logins():
     return render_template('logins.html', users=users, attempts=attempts)
 
 
+@main.route('/users/<int:user_id>/delete', methods=['POST'])
+@login_required
+def delete_user(user_id):
+    if not current_user.is_admin:
+        flash('No tens permisos per realitzar aquesta acció.', 'danger')
+        return redirect(url_for('main.welcome'))
+
+    user = db.session.get(User, user_id)
+    if not user:
+        flash('Usuari no trobat.', 'warning')
+        return redirect(url_for('main.logins'))
+
+    if user.id == current_user.id:
+        flash('No pots esborrar el teu propi usuari mentre tens la sessió iniciada.', 'warning')
+        return redirect(url_for('main.logins'))
+
+    username = user.username
+    db.session.delete(user)
+    db.session.commit()
+    flash(f'Usuari "{username}" esborrat correctament.', 'success')
+    return redirect(url_for('main.logins'))
+
+
 @main.route('/logout')
 @login_required
 def logout():

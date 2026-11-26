@@ -23,6 +23,7 @@
                                 <th><i class="bi bi-key me-1"></i>Contrasenya</th>
                                 <th><i class="bi bi-phone me-1"></i>Token MFA</th>
                                 <th><i class="bi bi-calendar-event me-1"></i>Data d'ingrés</th>
+                                <th class="text-end"><i class="bi bi-gear me-1"></i>Accions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -32,6 +33,19 @@
                                 <td><code>********</code></td>
                                 <td><code>{{ user.mfa_token }}</code></td>
                                 <td>{{ user.created_at.strftime('%d/%m/%Y %H:%M') if user.created_at else 'N/A' }}</td>
+                                <td class="text-end">
+                                    {% if user.id != current_user.id %}
+                                    <form method="POST" action="{{ url_for('main.delete_user', user_id=user.id) }}" class="d-inline"
+                                          onsubmit="return confirm('Segur que vols esborrar l\'usuari {{ user.username }}?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Esborrar usuari">
+                                            <i class="bi bi-trash"></i> Esborrar
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <span class="badge bg-info text-dark">Sessió actual</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
