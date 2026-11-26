@@ -18,6 +18,10 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
+    def is_admin(self):
+        return self.username.startswith('Admin')
+
     def __repr__(self):
         return f'<User {self.username}>'
 

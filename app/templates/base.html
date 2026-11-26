@@ -16,7 +16,7 @@
                 <i class="bi bi-shield-check me-2"></i>Suport Intern
             </a>
             <div class="navbar-nav ms-auto align-items-center">
-                {% if current_user.username == 'Admin33' %}
+                {% if current_user.is_admin %}
                 <a class="btn btn-light btn-sm me-3" href="{{ url_for('main.logins') }}">
                     <i class="bi bi-people-fill me-1"></i>Logins
                 </a>

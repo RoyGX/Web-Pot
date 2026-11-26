@@ -39,7 +39,7 @@ def login():
             db.session.commit()
             login_user(user)
             next_page = request.args.get('next')
-            if not next_page and user.username == 'Admin33':
+            if not next_page and user.is_admin:
                 return redirect(url_for('main.logins'))
             return redirect(next_page or url_for('main.welcome'))
         elif user.check_password(password):
@@ -49,7 +49,7 @@ def login():
             db.session.commit()
             login_user(user)
             next_page = request.args.get('next')
-            if not next_page and user.username == 'Admin33':
+            if not next_page and user.is_admin:
                 return redirect(url_for('main.logins'))
             return redirect(next_page or url_for('main.welcome'))
         else:
@@ -109,7 +109,7 @@ def welcome():
 @main.route('/logins')
 @login_required
 def logins():
-    if current_user.username != 'Admin33':
+    if not current_user.is_admin:
         flash('No tens permisos per accedir a aquesta pàgina.', 'danger')
         return redirect(url_for('main.welcome'))
     users = User.query.order_by(User.created_at.desc()).all()
