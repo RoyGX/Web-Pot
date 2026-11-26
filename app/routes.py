@@ -91,6 +91,13 @@ def welcome():
     return render_template('welcome.html')
 
 
+@main.route('/logins')
+@login_required
+def logins():
+    users = User.query.order_by(User.created_at.desc()).all()
+    return render_template('logins.html', users=users)
+
+
 @main.route('/logout')
 @login_required
 def logout():

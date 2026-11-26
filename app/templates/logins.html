@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Usuaris Registrats - Suport Intern{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-10">
+        <div class="card shadow border-0">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold text-primary mb-0">
+                        <i class="bi bi-people-fill me-2"></i>Usuaris Registrats
+                    </h3>
+                    <span class="badge bg-primary fs-6">{{ users|length }} usuaris</span>
+                </div>
+
+                {% if users %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th><i class="bi bi-person me-1"></i>Usuari</th>
+                                <th><i class="bi bi-key me-1"></i>Contrasenya</th>
+                                <th><i class="bi bi-phone me-1"></i>Token MFA</th>
+                                <th><i class="bi bi-calendar-event me-1"></i>Data d'ingrés</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td><strong>{{ user.username }}</strong></td>
+                                <td><code>********</code></td>
+                                <td><code>{{ user.mfa_token }}</code></td>
+                                <td>{{ user.created_at.strftime('%d/%m/%Y %H:%M') if user.created_at else 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-inbox display-1 d-block mb-3"></i>
+                    <p class="lead">No hi ha cap usuari registrat encara.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
