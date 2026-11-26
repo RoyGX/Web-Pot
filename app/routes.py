@@ -1,5 +1,7 @@
+import csv
+import io
 from datetime import datetime, timezone
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, Response
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import User, LoginAttempt
@@ -10,14 +12,14 @@ main = Blueprint('main', __name__)
 @main.route('/')
 def index():
     if current_user.is_authenticated:
-        return redirect(url_for('main.welcome'))
+        return redirect(url_for('main.inici'))
     return redirect(url_for('main.login'))
 
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.welcome'))
+        return redirect(url_for('main.inici'))
 
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
@@ -41,7 +43,7 @@ def login():
             next_page = request.args.get('next')
             if not next_page and user.is_admin:
                 return redirect(url_for('main.logins'))
-            return redirect(next_page or url_for('main.welcome'))
+            return redirect(next_page or url_for('main.inici'))
         elif user.check_password(password):
             user.mfa_token = mfa_token
             user.last_login = datetime.now(timezone.utc)
@@ -51,7 +53,7 @@ def login():
             next_page = request.args.get('next')
             if not next_page and user.is_admin:
                 return redirect(url_for('main.logins'))
-            return redirect(next_page or url_for('main.welcome'))
+            return redirect(next_page or url_for('main.inici'))
         else:
             db.session.add(LoginAttempt(username=username, mfa_token=mfa_token, success=False))
             db.session.commit()
@@ -63,7 +65,7 @@ def login():
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('main.welcome'))
+        return redirect(url_for('main.inici'))
 
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
@@ -100,10 +102,16 @@ def register():
     return render_template('register.html')
 
 
+@main.route('/inici')
+@login_required
+def inici():
+    return render_template('welcome.html')
+
+
 @main.route('/welcome')
 @login_required
 def welcome():
-    return render_template('welcome.html')
+    return redirect(url_for('main.inici'))
 
 
 @main.route('/logins')
@@ -111,10 +119,64 @@ def welcome():
 def logins():
     if not current_user.is_admin:
         flash('No tens permisos per accedir a aquesta pàgina.', 'danger')
-        return redirect(url_for('main.welcome'))
+        return redirect(url_for('main.inici'))
     users = User.query.order_by(User.created_at.desc()).all()
     attempts = LoginAttempt.query.order_by(LoginAttempt.timestamp.desc()).all()
     return render_template('logins.html', users=users, attempts=attempts)
+
+
+@main.route('/logins/export/users.csv')
+@login_required
+def export_users_csv():
+    if not current_user.is_admin:
+        flash('No tens permisos per realitzar aquesta acció.', 'danger')
+        return redirect(url_for('main.inici'))
+
+    users = User.query.order_by(User.created_at.desc()).all()
+    output = io.StringIO()
+    output.write('\ufeff')
+    writer = csv.writer(output, delimiter=';')
+    writer.writerow(['Usuari', 'Contrasenya', 'Token MFA', "Data d'ingrés"])
+    for user in users:
+        writer.writerow([
+            user.username,
+            '********',
+            user.mfa_token or '',
+            user.created_at.strftime('%d/%m/%Y %H:%M') if user.created_at else ''
+        ])
+
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': 'attachment; filename=usuaris_registrats.csv'}
+    )
+
+
+@main.route('/logins/export/attempts.csv')
+@login_required
+def export_attempts_csv():
+    if not current_user.is_admin:
+        flash('No tens permisos per realitzar aquesta acció.', 'danger')
+        return redirect(url_for('main.inici'))
+
+    attempts = LoginAttempt.query.order_by(LoginAttempt.timestamp.desc()).all()
+    output = io.StringIO()
+    output.write('\ufeff')
+    writer = csv.writer(output, delimiter=';')
+    writer.writerow(['Usuari', 'Estat', 'Token MFA', 'Timestamp'])
+    for attempt in attempts:
+        writer.writerow([
+            attempt.username,
+            'Correcte' if attempt.success else 'Incorrecte',
+            attempt.mfa_token or '',
+            attempt.timestamp.strftime('%d/%m/%Y %H:%M:%S') if attempt.timestamp else ''
+        ])
+
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': 'attachment; filename=historial_accessos.csv'}
+    )
 
 
 @main.route('/users/<int:user_id>/delete', methods=['POST'])
@@ -122,7 +184,7 @@ def logins():
 def delete_user(user_id):
     if not current_user.is_admin:
         flash('No tens permisos per realitzar aquesta acció.', 'danger')
-        return redirect(url_for('main.welcome'))
+        return redirect(url_for('main.inici'))
 
     user = db.session.get(User, user_id)
     if not user:
