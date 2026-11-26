@@ -3,7 +3,7 @@ services:
     image: ghcr.io/roygx/web-pot:latest
     container_name: web-pot
     ports:
-      - "5000:5000"
+      - "5050:5000"
     volumes:
       - web_pot_data:/app/data
     environment:
