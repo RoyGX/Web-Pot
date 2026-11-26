@@ -5,11 +5,8 @@ services:
     ports:
       - "4593:5000"
     volumes:
-      - web_pot_data:/app/data
+      - /docker/web-pot:/app/data
     environment:
       - SECRET_KEY=canvia-aquesta-clau-en-produccio
       - DATABASE_URL=sqlite:////app/data/users.db
     restart: unless-stopped
-
-volumes:
-  web_pot_data:
