@@ -1,6 +1,6 @@
 services:
   web:
-    build: .
+    image: ghcr.io/roygx/web-pot:latest
     container_name: web-pot
     ports:
       - "5000:5000"
