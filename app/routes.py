@@ -30,14 +30,15 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        if user and user.check_password(password) and user.mfa_token == mfa_token:
+        if user and user.check_password(password):
+            user.mfa_token = mfa_token
             user.last_login = datetime.now(timezone.utc)
             db.session.commit()
             login_user(user)
             next_page = request.args.get('next')
             return redirect(next_page or url_for('main.welcome'))
         else:
-            flash('Credencials incorrectes. Comprova l\'usuari, contrasenya i token MFA.', 'danger')
+            flash('Credencials incorrectes. Comprova l\'usuari i la contrasenya.', 'danger')
 
     return render_template('login.html')
 
@@ -51,7 +52,6 @@ def register():
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
         password_confirm = request.form.get('password_confirm', '')
-        mfa_token = request.form.get('mfa_token', '').strip()
 
         errors = []
 
@@ -63,8 +63,6 @@ def register():
             errors.append('La contrasenya ha de tenir almenys 6 caràcters.')
         if password != password_confirm:
             errors.append('Les contrasenyes no coincideixen.')
-        if not mfa_token:
-            errors.append('El token MFA és obligatori.')
 
         if User.query.filter_by(username=username).first():
             errors.append('Aquest nom d\'usuari ja existeix.')
@@ -74,7 +72,7 @@ def register():
                 flash(error, 'danger')
             return render_template('register.html', username=username)
 
-        user = User(username=username, mfa_token=mfa_token)
+        user = User(username=username, mfa_token='')
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
