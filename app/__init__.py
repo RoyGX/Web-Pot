@@ -15,9 +15,16 @@ def create_app():
     app.config.from_object('config.Config')
 
     # Ensure the data directory exists for SQLite
-    db_path = app.config['SQLALCHEMY_DATABASE_URI']
-    if db_path.startswith('sqlite:///'):
-        db_dir = os.path.dirname(db_path.replace('sqlite:///', ''))
+    db_uri = app.config['SQLALCHEMY_DATABASE_URI']
+    if db_uri.startswith('sqlite:////'):
+        # Absolute path: sqlite:////app/data/users.db -> /app/data/users.db
+        db_file = db_uri.replace('sqlite:////', '/')
+        db_dir = os.path.dirname(db_file)
+        os.makedirs(db_dir, exist_ok=True)
+    elif db_uri.startswith('sqlite:///'):
+        # Relative path
+        db_file = db_uri.replace('sqlite:///', '')
+        db_dir = os.path.dirname(db_file)
         if db_dir:
             os.makedirs(db_dir, exist_ok=True)
 
