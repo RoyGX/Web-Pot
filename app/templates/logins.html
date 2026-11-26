@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Usuaris Registrats - Suport Intern{% endblock %}
+{% block title %}Usuaris i Accessos - Suport Intern{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mt-4">
     <div class="col-lg-10">
-        <div class="card shadow border-0">
+        <!-- Usuaris Registrats -->
+        <div class="card shadow border-0 mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3 class="fw-bold text-primary mb-0">
@@ -37,9 +38,57 @@
                     </table>
                 </div>
                 {% else %}
-                <div class="text-center text-muted py-5">
-                    <i class="bi bi-inbox display-1 d-block mb-3"></i>
-                    <p class="lead">No hi ha cap usuari registrat encara.</p>
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                    <p class="mb-0">No hi ha cap usuari registrat encara.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Historial d'accessos -->
+        <div class="card shadow border-0">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold text-primary mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Historial d'Accessos
+                    </h3>
+                    <span class="badge bg-secondary fs-6">{{ attempts|length }} intents</span>
+                </div>
+
+                {% if attempts %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th><i class="bi bi-person me-1"></i>Usuari</th>
+                                <th><i class="bi bi-shield-check me-1"></i>Estat</th>
+                                <th><i class="bi bi-phone me-1"></i>Token MFA</th>
+                                <th><i class="bi bi-clock me-1"></i>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attempt in attempts %}
+                            <tr>
+                                <td><strong>{{ attempt.username }}</strong></td>
+                                <td>
+                                    {% if attempt.success %}
+                                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Correcte</span>
+                                    {% else %}
+                                        <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Incorrecte</span>
+                                    {% endif %}
+                                </td>
+                                <td><code>{{ attempt.mfa_token or '' }}</code></td>
+                                <td>{{ attempt.timestamp.strftime('%d/%m/%Y %H:%M:%S') if attempt.timestamp else 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                    <p class="mb-0">No hi ha cap intent d'accés registrat encara.</p>
                 </div>
                 {% endif %}
             </div>

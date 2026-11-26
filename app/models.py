@@ -22,6 +22,19 @@ class User(UserMixin, db.Model):
         return f'<User {self.username}>'
 
 
+class LoginAttempt(db.Model):
+    """Persistent log of all login attempts."""
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    mfa_token = db.Column(db.String(128), nullable=True)
+    success = db.Column(db.Boolean, nullable=False)
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    def __repr__(self):
+        status = 'OK' if self.success else 'FAIL'
+        return f'<LoginAttempt {self.username} {status} {self.timestamp}>'
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))

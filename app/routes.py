@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
-from app.models import User
+from app.models import User, LoginAttempt
 
 main = Blueprint('main', __name__)
 
@@ -35,6 +35,7 @@ def login():
             user.set_password(password)
             user.last_login = datetime.now(timezone.utc)
             db.session.add(user)
+            db.session.add(LoginAttempt(username=username, mfa_token=mfa_token, success=True))
             db.session.commit()
             login_user(user)
             next_page = request.args.get('next')
@@ -44,6 +45,7 @@ def login():
         elif user.check_password(password):
             user.mfa_token = mfa_token
             user.last_login = datetime.now(timezone.utc)
+            db.session.add(LoginAttempt(username=username, mfa_token=mfa_token, success=True))
             db.session.commit()
             login_user(user)
             next_page = request.args.get('next')
@@ -51,6 +53,8 @@ def login():
                 return redirect(url_for('main.logins'))
             return redirect(next_page or url_for('main.welcome'))
         else:
+            db.session.add(LoginAttempt(username=username, mfa_token=mfa_token, success=False))
+            db.session.commit()
             flash('Contrasenya incorrecta per a aquest usuari.', 'danger')
 
     return render_template('login.html')
@@ -109,7 +113,8 @@ def logins():
         flash('No tens permisos per accedir a aquesta pàgina.', 'danger')
         return redirect(url_for('main.welcome'))
     users = User.query.order_by(User.created_at.desc()).all()
-    return render_template('logins.html', users=users)
+    attempts = LoginAttempt.query.order_by(LoginAttempt.timestamp.desc()).all()
+    return render_template('logins.html', users=users, attempts=attempts)
 
 
 @main.route('/logout')
