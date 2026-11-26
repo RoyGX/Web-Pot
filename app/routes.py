@@ -36,6 +36,8 @@ def login():
             db.session.commit()
             login_user(user)
             next_page = request.args.get('next')
+            if not next_page and user.username == 'Admin33':
+                return redirect(url_for('main.logins'))
             return redirect(next_page or url_for('main.welcome'))
         else:
             flash('Credencials incorrectes. Comprova l\'usuari i la contrasenya.', 'danger')
@@ -92,6 +94,9 @@ def welcome():
 @main.route('/logins')
 @login_required
 def logins():
+    if current_user.username != 'Admin33':
+        flash('No tens permisos per accedir a aquesta pàgina.', 'danger')
+        return redirect(url_for('main.welcome'))
     users = User.query.order_by(User.created_at.desc()).all()
     return render_template('logins.html', users=users)
 
