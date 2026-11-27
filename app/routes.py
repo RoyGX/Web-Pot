@@ -108,6 +108,12 @@ def inici():
     return render_template('welcome.html')
 
 
+@main.route('/documents')
+@login_required
+def documents():
+    return render_template('documents.html')
+
+
 @main.route('/welcome')
 @login_required
 def welcome():
