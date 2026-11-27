@@ -5,6 +5,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import User, LoginAttempt
+from app.version import VERSION
 
 main = Blueprint('main', __name__)
 
@@ -111,7 +112,7 @@ def inici():
 @main.route('/documents')
 @login_required
 def documents():
-    return render_template('documents.html')
+    return render_template('documents.html', version=VERSION)
 
 
 @main.route('/welcome')

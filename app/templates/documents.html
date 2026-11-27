@@ -17,17 +17,17 @@
                         <a href="{{ url_for('main.inici') }}" class="btn btn-outline-secondary btn-sm">
                             <i class="bi bi-arrow-left me-1"></i>Tornar a l'inici
                         </a>
-                        <a href="{{ url_for('static', filename='docs/fitxa_rlt.pdf') }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <a href="{{ url_for('static', filename='docs/fitxa_rlt.pdf') }}?v={{ version }}" target="_blank" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-box-arrow-up-right me-1"></i>Obrir en pestanya nova
                         </a>
-                        <a href="{{ url_for('static', filename='docs/fitxa_rlt.pdf') }}" download="Fitxa RLT.pdf" class="btn btn-primary btn-sm">
+                        <a href="{{ url_for('static', filename='docs/fitxa_rlt.pdf') }}?v={{ version }}" download="Fitxa RLT.pdf" class="btn btn-primary btn-sm">
                             <i class="bi bi-download me-1"></i>Descarregar PDF
                         </a>
                     </div>
                 </div>
 
                 <div class="border rounded overflow-hidden bg-light">
-                    <iframe src="{{ url_for('static', filename='docs/fitxa_rlt.pdf') }}"
+                    <iframe src="{{ url_for('static', filename='docs/fitxa_rlt.pdf') }}?v={{ version }}"
                             width="100%"
                             height="750px"
                             style="border: none; display: block;">
