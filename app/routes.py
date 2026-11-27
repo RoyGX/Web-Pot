@@ -186,6 +186,19 @@ def export_attempts_csv():
     )
 
 
+@main.route('/logins/clear-attempts', methods=['POST'])
+@login_required
+def clear_attempts():
+    if not current_user.is_admin:
+        flash('No tens permisos per realitzar aquesta acció.', 'danger')
+        return redirect(url_for('main.inici'))
+
+    LoginAttempt.query.delete()
+    db.session.commit()
+    flash('Historial d\'accessos netejat correctament.', 'success')
+    return redirect(url_for('main.logins'))
+
+
 @main.route('/users/<int:user_id>/delete', methods=['POST'])
 @login_required
 def delete_user(user_id):
